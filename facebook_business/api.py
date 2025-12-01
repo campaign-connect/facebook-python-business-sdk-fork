@@ -85,10 +85,12 @@ class FacebookResponse(object):
 
         json_body = self.json()
 
-        if isinstance(json_body, collections_abc.Mapping) and 'error' in json_body:
-            # Is a dictionary, has error in it
-            return False
-        elif bool(json_body):
+        if isinstance(json_body, collections_abc.Mapping):
+            # Check for error indicators
+            if 'error' in json_body or 'fault' in json_body:
+                return False
+
+        if bool(json_body):
             # Has body and no error
             if 'success' in json_body:
                 return json_body['success']
@@ -154,18 +156,22 @@ class FacebookAdsApi(object):
     _default_api = None
     _default_account_id = None
 
-    def __init__(self, session, api_version=None, enable_debug_logger=False):
+    def __init__(self, session, api_version=None, enable_debug_logger=False, custom_headers=None, account_id_header=None):
         """Initializes the api instance.
         Args:
             session: FacebookSession object that contains a requests interface
                 and attribute GRAPH (the Facebook GRAPH API URL).
             api_version: API version
+            custom_headers: Optional dictionary of custom headers to include in all requests
+            account_id_header: Optional account ID to include in X-CC-Account-Id header
         """
         self._session = session
         self._num_requests_succeeded = 0
         self._num_requests_attempted = 0
         self._api_version = api_version or self.API_VERSION
         self._enable_debug_logger = enable_debug_logger
+        self._custom_headers = custom_headers
+        self._account_id_header = account_id_header
 
     def get_num_requests_attempted(self):
         """Returns the number of calls attempted."""
@@ -187,10 +193,14 @@ class FacebookAdsApi(object):
         timeout=None,
         debug=False,
         crash_log=True,
+        base_path=None,
+        custom_headers=None,
+        account_id_header=None,
     ):
         session = FacebookSession(app_id, app_secret, access_token, proxies,
-                                  timeout)
-        api = cls(session, api_version, enable_debug_logger=debug)
+                                  timeout, base_path=base_path)
+        api = cls(session, api_version, enable_debug_logger=debug,
+                  custom_headers=custom_headers, account_id_header=account_id_header)
         cls.set_default_api(api)
 
         if account_id:
@@ -281,6 +291,12 @@ class FacebookAdsApi(object):
 
         self._num_requests_attempted += 1
 
+        account_id = self._account_id_header
+        if not account_id and not isinstance(path, six.string_types) and path:
+            node_id = str(path[0])
+            clean_id = node_id[4:] if node_id.startswith('act_') else node_id
+            account_id = node_id if clean_id.isdigit() else None
+
         if not isinstance(path, six.string_types):
             # Path is not a full path
             path = "/".join((
@@ -292,6 +308,15 @@ class FacebookAdsApi(object):
         # Include api headers in http request
         headers = headers.copy()
         headers.update(FacebookAdsApi.HTTP_DEFAULT_HEADERS)
+
+        # Add custom headers if configured
+        if self._custom_headers:
+            headers.update(self._custom_headers)
+
+        # Add X-CC-Account-Id header (without 'act_' prefix)
+        if account_id:
+            account_id_str = str(account_id)
+            headers['X-CC-Account-Id'] = account_id_str[4:] if account_id_str.startswith('act_') else account_id_str
 
         if params:
             params = _top_level_param_json_encode(params)

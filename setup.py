@@ -28,13 +28,14 @@ this_dir = os.path.dirname(__file__)
 readme_filename = os.path.join(this_dir, 'README.md')
 requirements_filename = os.path.join(this_dir, 'requirements.txt')
 
-PACKAGE_NAME = 'facebook_business'
-PACKAGE_VERSION = '24.0.1'
-PACKAGE_AUTHOR = 'Facebook'
+PACKAGE_NAME = 'facebook-business-sdk-radium'
+PACKAGE_VERSION = '24.0.0+cc.1'
+PACKAGE_AUTHOR = 'Facebook (Campaign Connect Fork)'
 PACKAGE_AUTHOR_EMAIL = 'shuotian@meta.com'
-PACKAGE_URL = 'https://github.com/facebook/facebook-python-business-sdk'
+PACKAGE_URL = 'https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork'
+# Not needed for git-based installation, but keeping for completeness
 PACKAGE_DOWNLOAD_URL = \
-    'https://github.com/facebook/facebook-python-business-sdk/tarball/' + PACKAGE_VERSION
+    'https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork/-/archive/' + PACKAGE_VERSION + '/facebook-python-business-sdk-cc-fork-' + PACKAGE_VERSION + '.tar.gz'
 PACKAGES = [
     'facebook_business',
     'facebook_business.test',
@@ -56,9 +57,9 @@ with open(readme_filename) as f:
 with open(requirements_filename) as f:
     PACKAGE_INSTALL_REQUIRES = []
     DEPENDENCY_LINKS = []
-    
+
     for line in f:
-        line = line.strip()  
+        line = line.strip()
         if line.lower().startswith(('http://', 'https://')):
             DEPENDENCY_LINKS.append(line)
         else:

@@ -69,6 +69,14 @@ class FacebookRequestError(FacebookError):
             if isinstance(error_data, dict) and error_data.get('blame_field_specs'):
                 self._api_blame_field_specs = \
                     error_data['blame_field_specs']
+        # Handle Apigee fault format
+        elif isinstance(self._body, dict) and 'fault' in self._body:
+            # Apigee: {"fault": {"faultstring": "...", "detail": {"errorcode": "..."}}}
+            fault = self._body['fault']
+            self._error = fault
+            self._api_error_message = fault.get('faultstring', '')
+            self._api_error_code = fault.get('detail', {}).get('errorcode')
+            self._api_error_type = 'ApigeeError'
         else:
             self._error = None
 

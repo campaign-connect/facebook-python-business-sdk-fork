@@ -461,5 +461,137 @@ class FacebookResponseTestCase(unittest.TestCase):
         resp = api.FacebookResponse(body="Service Unavailable", http_status=200)
         self.assertFalse(resp.is_success())
 
+    def test_is_success_with_apigee_fault(self):
+        """Test that Apigee fault format is detected as failure"""
+        body = json.dumps({
+            "fault": {
+                "faultstring": "Invalid ApiKey",
+                "detail": {"errorcode": "oauth.v2.InvalidApiKey"}
+            }
+        })
+        resp = api.FacebookResponse(body=body, http_status=401)
+        self.assertFalse(resp.is_success())
+
+    def test_is_success_with_facebook_error(self):
+        """Test that Facebook error format is detected as failure"""
+        body = json.dumps({
+            "error": {
+                "message": "Invalid OAuth access token",
+                "type": "OAuthException",
+                "code": 190
+            }
+        })
+        resp = api.FacebookResponse(body=body, http_status=400)
+        self.assertFalse(resp.is_success())
+
+
+class ProxyFeaturesTestCase(unittest.TestCase):
+    """Test cases for proxy support features"""
+
+    def test_base_path_injection(self):
+        """Test that base_path overrides default GRAPH URL"""
+        custom_base = 'https://proxy.example.com/api'
+        fb_session = session.FacebookSession(
+            access_token='test_token',
+            base_path=custom_base
+        )
+        self.assertEqual(fb_session.GRAPH, custom_base)
+
+    def test_base_path_strips_trailing_slash(self):
+        """Test that trailing slash is removed from base_path"""
+        custom_base = 'https://proxy.example.com/api/'
+        fb_session = session.FacebookSession(
+            access_token='test_token',
+            base_path=custom_base
+        )
+        self.assertEqual(fb_session.GRAPH, 'https://proxy.example.com/api')
+
+    def test_custom_headers_initialization(self):
+        """Test that custom headers are stored in API instance"""
+        custom_headers = {
+            'x-apikey': 'test-key-123',
+            'X-Custom-Header': 'custom-value'
+        }
+        fb_session = session.FacebookSession(access_token='test_token')
+        fb_api = api.FacebookAdsApi(
+            fb_session,
+            custom_headers=custom_headers
+        )
+        self.assertEqual(fb_api._custom_headers, custom_headers)
+
+    def test_account_id_header_initialization(self):
+        """Test that account_id_header is stored in API instance"""
+        account_id = 'act_123456789'
+        fb_session = session.FacebookSession(access_token='test_token')
+        fb_api = api.FacebookAdsApi(
+            fb_session,
+            account_id_header=account_id
+        )
+        self.assertEqual(fb_api._account_id_header, account_id)
+
+
+class ApigeeErrorHandlingTestCase(unittest.TestCase):
+    """Test cases for Apigee error format handling"""
+
+    def test_apigee_fault_parsing(self):
+        """Test that Apigee fault format is properly parsed"""
+        body = {
+            "fault": {
+                "faultstring": "Invalid ApiKey",
+                "detail": {"errorcode": "oauth.v2.InvalidApiKey"}
+            }
+        }
+        error = exceptions.FacebookRequestError(
+            message="Call failed",
+            request_context={'method': 'GET', 'path': '/test'},
+            http_status=401,
+            http_headers={},
+            body=json.dumps(body)
+        )
+        self.assertEqual(error.api_error_message(), "Invalid ApiKey")
+        self.assertEqual(error.api_error_code(), "oauth.v2.InvalidApiKey")
+        self.assertEqual(error.api_error_type(), "ApigeeError")
+
+    def test_apigee_fault_without_errorcode(self):
+        """Test Apigee fault parsing when errorcode is missing"""
+        body = {
+            "fault": {
+                "faultstring": "Service Unavailable"
+            }
+        }
+        error = exceptions.FacebookRequestError(
+            message="Call failed",
+            request_context={'method': 'GET', 'path': '/test'},
+            http_status=503,
+            http_headers={},
+            body=json.dumps(body)
+        )
+        self.assertEqual(error.api_error_message(), "Service Unavailable")
+        self.assertIsNone(error.api_error_code())
+        self.assertEqual(error.api_error_type(), "ApigeeError")
+
+    def test_facebook_error_still_works(self):
+        """Test that original Facebook error format still works"""
+        body = {
+            "error": {
+                "message": "Invalid OAuth access token",
+                "type": "OAuthException",
+                "code": 190,
+                "error_subcode": 463
+            }
+        }
+        error = exceptions.FacebookRequestError(
+            message="Call failed",
+            request_context={'method': 'GET', 'path': '/test'},
+            http_status=400,
+            http_headers={},
+            body=json.dumps(body)
+        )
+        self.assertEqual(error.api_error_message(), "Invalid OAuth access token")
+        self.assertEqual(error.api_error_code(), 190)
+        self.assertEqual(error.api_error_type(), "OAuthException")
+        self.assertEqual(error.api_error_subcode(), 463)
+
+
 if __name__ == '__main__':
     unittest.main()

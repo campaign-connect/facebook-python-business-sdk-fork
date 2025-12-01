@@ -25,11 +25,30 @@ This fork adds these features while maintaining full compatibility with the orig
 ### 1. Base Path Injection
 Route all API calls through your proxy instead of directly to Facebook.
 
+**Option A: Environment Variable (Recommended)**
+
+Set `FACEBOOK_GRAPH_BASE_URL` in your environment - no code changes needed:
+
+```bash
+export FACEBOOK_GRAPH_BASE_URL=https://api.choreograph.com/choreograph/connect/proxy/v1/meta
+```
+
+Then initialize normally:
+```python
+FacebookAdsApi.init()  # Automatically uses FACEBOOK_GRAPH_BASE_URL
+```
+
+**Option B: Direct Argument**
+
+Pass `base_path` directly (overrides environment variable):
+
 ```python
 FacebookAdsApi.init(
     base_path='https://api.choreograph.com/choreograph/connect/proxy/v1/meta'
 )
 ```
+
+**Priority:** `base_path` argument > `FACEBOOK_GRAPH_BASE_URL` env var > default (`https://graph.facebook.com`)
 
 ### 2. Custom Headers
 Add custom headers to all requests (API keys, auth tokens, etc.).

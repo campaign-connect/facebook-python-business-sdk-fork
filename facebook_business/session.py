@@ -28,15 +28,25 @@ class FacebookSession(object):
         proxies: Object containing proxies for 'http' and 'https'
         requests: The python requests object through which calls to the api can
             be made.
+
+    Environment Variables:
+        FACEBOOK_GRAPH_BASE_URL: Base URL for the Graph API (recommended way to
+            configure custom endpoints like Apigee proxy). Takes precedence over
+            the default but can be overridden by the base_path argument.
     """
     GRAPH = 'https://graph.facebook.com'
 
     def __init__(self, app_id=None, app_secret=None, access_token=None,
-                 proxies=None, timeout=None, debug=False):
+             proxies=None, timeout=None, debug=False, base_path=None):
         """
         Initializes and populates the instance attributes with app_id,
         app_secret, access_token, appsecret_proof, proxies, timeout and requests
         given arguments app_id, app_secret, access_token, proxies and timeout.
+
+        Args:
+            base_path: Optional. Custom base URL for the Graph API. If not provided,
+                falls back to FACEBOOK_GRAPH_BASE_URL environment variable (recommended),
+                then to the default 'https://graph.facebook.com'.
         """
         self.app_id = app_id
         self.app_secret = app_secret
@@ -44,6 +54,11 @@ class FacebookSession(object):
         self.proxies = proxies
         self.timeout = timeout
         self.debug = debug
+        # Allow overriding the base path for Apigee proxy support
+        # Priority: base_path argument > FACEBOOK_GRAPH_BASE_URL env var > default
+        effective_base_path = base_path or os.environ.get('FACEBOOK_GRAPH_BASE_URL')
+        if effective_base_path:
+            self.GRAPH = effective_base_path.rstrip('/')
         self.requests = requests.Session()
         self.requests.verify = os.path.join(
             os.path.dirname(__file__),

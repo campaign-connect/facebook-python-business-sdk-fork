@@ -89,7 +89,7 @@ except FacebookRequestError as e:
 ### Quick Install
 
 ```bash
-pip install git+https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git@v24.0.0+cc.1
+pip install git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git
 ```
 
 ### Adding to Your Project
@@ -97,30 +97,24 @@ pip install git+https://gitlab.com/2sixty/activation/radium/facebook-python-busi
 **pyproject.toml (Poetry, setuptools):**
 ```toml
 [tool.poetry.dependencies]
-facebook-business-sdk-radium = {git = "https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git", tag = "v24.0.0+cc.1"}
+facebook-business-sdk-radium = {git = "git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git"}
 
 # Or using PEP 508 format:
 [project]
 dependencies = [
-    "facebook-business-sdk-radium @ git+https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git@v24.0.0+cc.1",
+    "facebook-business-sdk-radium @ git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git",
 ]
 
 # Or with SSH:
 dependencies = [
-    "facebook-business-sdk-radium @ git+ssh://git@gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git@v24.0.0+cc.1",
+    "facebook-business-sdk-radium @ git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git",
 ]
 ```
 
 **requirements.txt:**
 ```txt
-# Specific version (recommended for production)
-git+https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git@v24.0.0+cc.1
-
-# Or using SSH
-git+ssh://git@gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git@v24.0.0+cc.1
-
-# Or latest from main branch
-git+https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git@main
+# Using SSH
+git+ssh://git@gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git
 ```
 
 **Note:** Package name is `facebook-business-sdk-radium`, but you still import as `facebook_business`:

@@ -89,6 +89,10 @@ except FacebookRequestError as e:
 ### Quick Install
 
 ```bash
+# Using specific version tag (recommended)
+pip install git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git@v24.0.0+cc.1
+
+# Or latest from main
 pip install git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git
 ```
 
@@ -97,24 +101,19 @@ pip install git+ssh://git@github.com/campaign-connect/facebook-python-business-s
 **pyproject.toml (Poetry, setuptools):**
 ```toml
 [tool.poetry.dependencies]
-facebook-business-sdk-radium = {git = "git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git"}
+facebook-business-sdk-radium = {git = "ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git", tag = "v24.0.0+cc.1"}
 
 # Or using PEP 508 format:
 [project]
 dependencies = [
-    "facebook-business-sdk-radium @ git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git",
-]
-
-# Or with SSH:
-dependencies = [
-    "facebook-business-sdk-radium @ git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git",
+    "facebook-business-sdk-radium @ git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git@v24.0.0+cc.1",
 ]
 ```
 
 **requirements.txt:**
 ```txt
-# Using SSH
-git+ssh://git@gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork.git
+# Using SSH with tag (recommended)
+git+ssh://git@github.com/campaign-connect/facebook-python-business-sdk-fork.git@v24.0.0+cc.1
 ```
 
 **Note:** Package name is `facebook-business-sdk-radium`, but you still import as `facebook_business`:
@@ -179,9 +178,11 @@ Both approaches work through the Choreograph proxy with all custom headers autom
 
 - **Base:** Facebook Business SDK v24.0.0
 - **Fork:** v24.0.0+cc.1
+- **Tag:** `v24.0.0+cc.1`
 - **Package name:** `facebook-business-sdk-radium`
 - **Import name:** `facebook_business` (unchanged from official SDK)
 - **Python:** 3.7+
+- **Repository:** https://github.com/campaign-connect/facebook-python-business-sdk-fork
 
 ## Maintenance
 
@@ -224,4 +225,4 @@ Same as original: [LICENSE.txt](LICENSE.txt)
 
 - **Proxy features:** Contact Campaign Connect team
 - **General SDK issues:** Refer to [upstream repo](https://github.com/facebook/facebook-python-business-sdk/issues)
-- **Repository:** https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork
+- **Repository:** https://github.com/campaign-connect/facebook-python-business-sdk-fork

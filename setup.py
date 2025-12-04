@@ -32,10 +32,10 @@ PACKAGE_NAME = 'facebook-business-sdk-radium'
 PACKAGE_VERSION = '24.0.0+cc.1'
 PACKAGE_AUTHOR = 'Facebook (Campaign Connect Fork)'
 PACKAGE_AUTHOR_EMAIL = 'shuotian@meta.com'
-PACKAGE_URL = 'https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork'
+PACKAGE_URL = 'https://github.com/campaign-connect/facebook-python-business-sdk-fork'
 # Not needed for git-based installation, but keeping for completeness
 PACKAGE_DOWNLOAD_URL = \
-    'https://gitlab.com/2sixty/activation/radium/facebook-python-business-sdk-cc-fork/-/archive/' + PACKAGE_VERSION + '/facebook-python-business-sdk-cc-fork-' + PACKAGE_VERSION + '.tar.gz'
+    'https://github.com/campaign-connect/facebook-python-business-sdk-fork/archive/refs/tags/v' + PACKAGE_VERSION + '.tar.gz'
 PACKAGES = [
     'facebook_business',
     'facebook_business.test',
